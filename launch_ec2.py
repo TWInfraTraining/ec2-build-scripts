@@ -8,8 +8,13 @@ import boto
 AMI_ID="ami-06ad526f"
 INSTANCE_TYPE="t1.micro"
 
+USERNAME="ubuntu"
+
 KEYPAIR_FILENAME = "keypair.pem"
 INSTANCE_FILENAME = "instance.json"
+
+SSH_FILENAME = "ec2_ssh"
+SCP_FILENAME = "ec2_scp"
 
 def load_data():
     inp = open(INSTANCE_FILENAME, 'r')
@@ -19,14 +24,37 @@ def load_data():
         inp.close()
 
 def dump_data(instance, key_name, security_group):
+    dns = instance.dns_name
     data  = { 'id' : instance.id,
-              'dns' : instance.dns_name,
+              'dns' : dns,
               'key_name' : key_name,
               'security_group' : security_group }
+
     out = open(INSTANCE_FILENAME, 'w')
     json.dump(data, out)
     out.flush()
     out.close()
+    os.chmod(INSTANCE_FILENAME, 0666)
+
+    ssh_out = open(SSH_FILENAME, 'w')
+    ssh_out.writelines([
+            "#!/usr/bin/env bash\n",
+            "\n",
+            "ssh -i %s %s@%s $*\n" % (KEYPAIR_FILENAME, USERNAME, dns),
+            ])
+    ssh_out.flush()
+    ssh_out.close()
+    os.chmod(SSH_FILENAME, 0755)
+
+    scp_out = open(SCP_FILENAME, 'w')
+    scp_out.writelines([
+            "#!/usr/bin/env bash\n",
+            "\n",
+            "scp -i %s $1 %s@%s:\n" % (KEYPAIR_FILENAME, USERNAME, dns),
+            ])
+    scp_out.flush()
+    scp_out.close()
+    os.chmod(SCP_FILENAME, 0755)
 
 def create_keypair(ec2, key_name):
     keypair = ec2.create_key_pair(key_name)
@@ -34,6 +62,7 @@ def create_keypair(ec2, key_name):
     out.write(keypair.material)
     out.flush()
     out.close()
+    os.chmod(KEYPAIR_FILENAME, 0600)
     print "Saved keypair %s to %s" % (key_name, KEYPAIR_FILENAME)
 
 def create_security_group(ec2, security_group):
@@ -63,7 +92,7 @@ def launch_instance(ec2, key_name, security_group):
     print "Launched instance %s" % instance
     return wait_for_instance(instance)
 
-def create(ec2, aws_access_key, aws_secret_key, key_name, security_group):
+def create(ec2, key_name, security_group):
     create_keypair(ec2, key_name)
     create_security_group(ec2, security_group)
     return launch_instance(ec2, key_name, security_group)
@@ -74,6 +103,8 @@ def clean(ec2, instance_id, key_name, security_group):
     ec2.delete_security_group(security_group)
     os.remove(KEYPAIR_FILENAME)
     os.remove(INSTANCE_FILENAME)
+    os.remove(SSH_FILENAME)
+    os.remove(SCP_FILENAME)
 
 def main(aws_access_key, aws_secret_key, revision, counter, mode):
     ec2 = boto.connect_ec2(aws_access_key, aws_secret_key)
@@ -104,9 +135,11 @@ if __name__ == "__main__":
         AMI_ID = os.environ['AMI_ID']
     if 'INSTANCE_TYPE' in os.environ:
         INSTANCE_TYPE = os.environ['INSTANCE_TYPE']
+    if 'USERNAME' in os.environ:
+        USERNAME = os.environ['USERNAME']
 
     if len(sys.argv) < 2:
         _usage()
     else:
         mode = sys.argv[1]
-        main(mode, aws_access_key, aws_secret_key, go_revision, pipeline_counter)
+        main(aws_access_key, aws_secret_key, go_revision, pipeline_counter, mode)
