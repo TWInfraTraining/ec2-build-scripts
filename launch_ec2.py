@@ -10,11 +10,14 @@ INSTANCE_TYPE="t1.micro"
 
 USERNAME="ubuntu"
 
-KEYPAIR_FILENAME = "keypair.pem"
-INSTANCE_FILENAME = "instance.json"
+if not os.path.exists('data'):
+    os.mkdir('data')
 
-SSH_FILENAME = "ec2_ssh"
-SCP_FILENAME = "ec2_scp"
+KEYPAIR_FILENAME = "data/keypair.pem"
+INSTANCE_FILENAME = "data/instance.json"
+
+SSH_FILENAME = "data/ec2_ssh"
+SCP_FILENAME = "data/ec2_scp"
 
 def load_data():
     inp = open(INSTANCE_FILENAME, 'r')
