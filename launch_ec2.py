@@ -43,7 +43,7 @@ def dump_data(instance, key_name, security_group):
     ssh_out.writelines([
             "#!/usr/bin/env bash\n",
             "\n",
-            "ssh -i %s %s@%s $*\n" % (KEYPAIR_FILENAME, USERNAME, dns),
+            "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i %s %s@%s $*\n" % (KEYPAIR_FILENAME, USERNAME, dns),
             ])
     ssh_out.flush()
     ssh_out.close()
@@ -53,7 +53,7 @@ def dump_data(instance, key_name, security_group):
     scp_out.writelines([
             "#!/usr/bin/env bash\n",
             "\n",
-            "scp -i %s $1 %s@%s:\n" % (KEYPAIR_FILENAME, USERNAME, dns),
+            "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i %s $1 %s@%s:\n" % (KEYPAIR_FILENAME, USERNAME, dns),
             ])
     scp_out.flush()
     scp_out.close()
