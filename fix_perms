@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+chmod +x data/ec2*
+chmod 600 data/keypair.pem
