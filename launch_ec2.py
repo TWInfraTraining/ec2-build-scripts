@@ -76,8 +76,8 @@ def create_security_group(ec2, security_group):
 def wait_for_instance(instance):
     print "Instance state is %s" % instance.state
     while instance.state == u'pending':
-        print "..." + instance.update()
         sleep(5)
+        print "..." + instance.update()
 
     if instance.state != u"running":
         raise Exception("Final instance state is %s instead of running" % instance.state)
