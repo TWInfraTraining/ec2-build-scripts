@@ -18,6 +18,7 @@ INSTANCE_FILENAME = "data/instance.json"
 
 SSH_FILENAME = "data/ec2_ssh"
 SCP_FILENAME = "data/ec2_scp"
+CUCUMBER_FILENAME = "data/ec2_cucumber"
 
 def load_data():
     inp = open(INSTANCE_FILENAME, 'r')
@@ -58,6 +59,16 @@ def dump_data(instance, key_name, security_group):
     scp_out.flush()
     scp_out.close()
     os.chmod(SCP_FILENAME, 0755)
+
+    cucumber_out = open(CUCUMBER_FILENAME, 'w')
+    cucumber_out.writelines([
+            "#!/usr/bin/env bash\n",
+            "\n",
+            "BASE_URL='http://%s' cucumber $*",
+            ])
+    cucumber_out.flush()
+    cucumber_out.close()
+    os.chmod(CUCUMBER_FILENAME, 0755)
 
 def create_keypair(ec2, key_name):
     keypair = ec2.create_key_pair(key_name)
