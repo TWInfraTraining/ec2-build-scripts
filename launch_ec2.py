@@ -64,7 +64,7 @@ def dump_data(instance, key_name, security_group):
     cucumber_out.writelines([
             "#!/usr/bin/env bash\n",
             "\n",
-            "BASE_URL='http://%s' cucumber $*",
+            "BASE_URL='http://%s' cucumber $*" % dns,
             ])
     cucumber_out.flush()
     cucumber_out.close()
