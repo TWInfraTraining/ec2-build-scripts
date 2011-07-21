@@ -82,6 +82,7 @@ def create_keypair(ec2, key_name):
 def create_security_group(ec2, security_group):
     sg = ec2.create_security_group(security_group, "Puppet testing")
     sg.authorize(ip_protocol="tcp", from_port="22", to_port="22", cidr_ip="0.0.0.0/0")
+    sg.authorize(ip_protocol="tcp", from_port="80", to_port="80", cidr_ip="0.0.0.0/0")
     print "Created security group named %s with ssh access" % security_group
 
 def wait_for_instance(instance):
