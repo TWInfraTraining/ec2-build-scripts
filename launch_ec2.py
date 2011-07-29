@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import json, os, sys
+import json, os, sys, socket
 from time import sleep
 
 import boto
@@ -124,9 +124,11 @@ def clean(ec2, instance_id, key_name, security_group):
 def main(aws_access_key, aws_secret_key, revision, counter, mode):
     ec2 = boto.connect_ec2(aws_access_key, aws_secret_key)
 
+    hostname = socket.gethostname()
+
     if mode == "start":
-        key_name = "Go-%s-%s-Key" % (revision, counter)
-        security_group = "Go-%s-%s-SG" % (revision, counter)
+        key_name = "Go-%s-%s-%s-Key" % (revision, counter, hostname)
+        security_group = "Go-%s-%s-%s-SG" % (revision, counter, hostname)
         instance = create(ec2, key_name, security_group)
         dump_data(instance, key_name, security_group)
     elif mode == "stop":
