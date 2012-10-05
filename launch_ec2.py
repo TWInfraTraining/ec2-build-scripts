@@ -114,7 +114,7 @@ def create(ec2, key_name, security_group):
 
 def clean(ec2, instance_id, key_name, security_group):
     instance = ec2.get_all_instances(instance_ids=[instance_id])[0].instances[0]
-    instance.terminate()
+    ec2.terminate_instances(instance_ids=[instance_id])
     wait_for_instance(instance, u"shutting-down", u"terminated")
     ec2.delete_key_pair(key_name)
     ec2.delete_security_group(security_group)
