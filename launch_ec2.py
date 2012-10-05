@@ -100,11 +100,21 @@ def wait_for_instance(instance, temporary_states, final_state):
 def wait_for_ssh(instance):
     dns = instance.dns_name
     print "Checking for SSH connection to %s" % dns
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(30)
-    s.connect((dns, 22))
-    s.shutdown(2)
-    print "SSH OK"
+    attempts = 0
+    while True:
+        if attempts > 10:
+            break
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(30)
+            s.connect((dns, 22))
+            s.shutdown(2)
+            print "SSH OK"
+            break
+        except:
+            attempts += 1
+            sleep(5)
+            continue
 
 def launch_instance(ec2, key_name, security_group):
     reservation = ec2.run_instances(image_id=AMI_ID,
