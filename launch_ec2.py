@@ -97,6 +97,15 @@ def wait_for_instance(instance, temporary_states, final_state):
         print "..%s!" % instance.state
         return instance
 
+def wait_for_ssh(instance):
+    dns = instance.dns_name
+    print "Checking for SSH connection to %s" % dns
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(30)
+    s.connect((dns, 22))
+    s.shutdown(2)
+    print "SSH OK"
+
 def launch_instance(ec2, key_name, security_group):
     reservation = ec2.run_instances(image_id=AMI_ID,
                                     key_name=key_name,
@@ -132,6 +141,7 @@ def main(aws_access_key, aws_secret_key, revision, counter, mode):
         key_name = "Go-%s-%s-%s-Key" % (revision, counter, hostname)
         security_group = "Go-%s-%s-%s-SG" % (revision, counter, hostname)
         instance = create(ec2, key_name, security_group)
+        wait_for_ssh(instance)
         dump_data(instance, key_name, security_group)
     elif mode == "stop":
         data = load_data()
