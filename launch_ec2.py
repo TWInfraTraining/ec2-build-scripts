@@ -85,16 +85,16 @@ def create_security_group(ec2, security_group):
     sg.authorize(ip_protocol="tcp", from_port="80", to_port="80", cidr_ip="0.0.0.0/0")
     print "Created security group named %s with ssh access" % security_group
 
-def wait_for_instance(instance):
+def wait_for_instance(instance, temporary_state, final_state):
     print "Instance state is %s" % instance.state
-    while instance.state == u'pending':
+    while instance.state == temporary_state:
         sleep(5)
         print "..." + instance.update()
 
-    if instance.state != u"running":
-        raise Exception("Final instance state is %s instead of running" % instance.state)
+    if instance.state != final_state:
+        raise Exception("Final instance state is %s instead of %s" % (instance.state, final_state))
     else:
-        print "..ready!"
+        print "..%s!" % instance.state
         return instance
 
 def launch_instance(ec2, key_name, security_group):
@@ -105,7 +105,7 @@ def launch_instance(ec2, key_name, security_group):
 
     instance = reservation.instances[0]
     print "Launched instance %s" % instance
-    return wait_for_instance(instance)
+    return wait_for_instance(instance, u"pending", u"running")
 
 def create(ec2, key_name, security_group):
     create_keypair(ec2, key_name)
@@ -113,7 +113,9 @@ def create(ec2, key_name, security_group):
     return launch_instance(ec2, key_name, security_group)
 
 def clean(ec2, instance_id, key_name, security_group):
-    ec2.terminate_instances(instance_ids=[instance_id])
+    instance = ec2.get_all_instances(instance_ids=[instance_id])[0].instances[0]
+    instance.terminate()
+    wait_for_instance(instance, u"shutting-down", u"terminated")
     ec2.delete_key_pair(key_name)
     ec2.delete_security_group(security_group)
     os.remove(KEYPAIR_FILENAME)
