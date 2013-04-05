@@ -167,7 +167,7 @@ if __name__ == "__main__":
     aws_access_key = os.environ["AWS_ACCESS_KEY"]
     aws_secret_key = os.environ["AWS_SECRET_KEY"]
 
-    go_revision = os.environ["GO_REVISION_BUILD-SCRIPTS"]
+    go_revision = os.environ["GO_REVISION_BUILD_SCRIPTS"]
     pipeline_counter = os.environ["GO_PIPELINE_COUNTER"]
 
     if 'AMI_ID' in os.environ:
