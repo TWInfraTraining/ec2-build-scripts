@@ -9,12 +9,12 @@ function ec2_ssh {
 }
 
 function vagrant_scp {
-	[ ! -f ~/.ssh/vagrant ] && wget https://raw.github.com/mitchellh/vagrant/master/keys/vagrant;mv ./vagrant ~/.ssh/;chmod 600 ~/.ssh/vagrant
+	[ ! -f ~/.ssh/vagrant ] && wget https://raw.github.com/mitchellh/vagrant/master/keys/vagrant&&mv ./vagrant ~/.ssh/&&chmod 600 ~/.ssh/vagrant
 	scp -o StrictHostKeyChecking=no -i ~/.ssh/vagrant $1 vagrant@$2:
 }
 
 function vagrant_ssh {
-	[ ! -f ~/.ssh/vagrant ] && wget https://raw.github.com/mitchellh/vagrant/master/keys/vagrant;mv ./vagrant ~/.ssh/;chmod 600 ~/.ssh/vagrant
+	[ ! -f ~/.ssh/vagrant ] && wget https://raw.github.com/mitchellh/vagrant/master/keys/vagrant&&mv ./vagrant ~/.ssh/&&chmod 600 ~/.ssh/vagrant
     ssh -o StrictHostKeyChecking=no -i ~/.ssh/vagrant vagrant@$1 $2
 }
 
