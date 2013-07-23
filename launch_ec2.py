@@ -5,7 +5,7 @@ from time import sleep
 
 import boto
 
-AMI_ID="ami-06ad526f"
+AMI_ID="ami-c0eac285"
 INSTANCE_TYPE="t1.micro"
 
 USERNAME="ubuntu"
